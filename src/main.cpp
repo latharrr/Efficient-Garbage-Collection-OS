@@ -1,91 +1,40 @@
-#include "../include/memory_manager.h"
+#include "../include/OSMemoryManager.h"
 #include <iostream>
 
-MemoryManager::MemoryManager() {
-    nextId = 1;
-}
-
-void MemoryManager::allocate(int size) {
-    MemoryBlock block;
-    block.id = nextId++;
-    block.size = size;
-    block.refCount = 1;
-    block.allocated = true;
-
-    memory.push_back(block);
-
-    std::cout << "Allocated Block ID: "
-              << block.id << " Size: " << block.size << std::endl;
-}
-
-void MemoryManager::addReference(int id) {
-    for (auto &block : memory) {
-        if (block.id == id && block.allocated) {
-            block.refCount++;
-            return;
-        }
-    }
-}
-
-void MemoryManager::removeReference(int id) {
-    for (auto &block : memory) {
-        if (block.id == id && block.allocated) {
-            block.refCount--;
-            return;
-        }
-    }
-}
-
-void MemoryManager::garbageCollect() {
-    std::cout << "\n[GC STARTED]\n";
-    for (auto &block : memory) {
-        if (block.allocated && block.refCount == 0) {
-            block.allocated = false;
-            std::cout << "Reclaimed Block ID: " << block.id << std::endl;
-        }
-    }
-}
-
-int MemoryManager::totalUsedMemory() {
-    int total = 0;
-    for (auto &block : memory) {
-        if (block.allocated)
-            total += block.size;
-    }
-    return total;
-}
-
-void MemoryManager::showMemoryStatus() {
-    std::cout << "\nFragmentation reduced after garbage collection\n";
-    for (auto &block : memory) {
-        std::cout << "ID: " << block.id
-                  << " Size: " << block.size
-                  << " RefCount: " << block.refCount
-                  << " Allocated: " << block.allocated
-                  << std::endl;
-    }
-}
-
-// Garbage Collection frees memory blocks with zero references
-
+using namespace std;
 
 int main() {
-    MemoryManager manager;
+    OSMemoryManager os;
+    int choice;
 
-    manager.allocate(100);
-    manager.allocate(200);
-    manager.allocate(300);
+    while (true) {
+        cout << "\n===== OS MEMORY MANAGEMENT MENU =====\n";
+        cout << "1. Allocate Memory\n";
+        cout << "2. Delete Memory (Process Termination)\n";
+        cout << "3. Run Garbage Collection\n";
+        cout << "4. Display Memory Status\n";
+        cout << "5. Exit\n";
+        cout << "Enter choice: ";
+        cin >> choice;
 
-    manager.removeReference(2);   // make block eligible for GC
-
-    manager.showMemoryStatus();
-
-    // 🔥 Demand-based GC trigger
-    if (manager.totalUsedMemory() > 400) {
-        manager.garbageCollect();
-    }
-
-    manager.showMemoryStatus();
-
-    return 0;
-}
+        if (choice == 1) {
+            int size;
+            cout << "Enter memory size to allocate: ";
+            cin >> size;
+            os.allocateMemory(size);
+        }
+        else if (choice == 2) {
+            int id;
+            cout << "Enter Block ID to delete: ";
+            cin >> id;
+            os.releaseReference(id);
+        }
+        else if (choice == 3) {
+            os.garbageCollect();
+        }
+        else if (choice == 4) {
+            os.displayMemoryStatus();
+        }
+        else if (choice == 5) {
+            cout << "Exiting OS Memory Manager...\n";
+            br
