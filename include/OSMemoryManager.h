@@ -9,15 +9,19 @@ private:
     std::vector<MemoryBlock> memory;
     int nextId;
 
+    int totalGcRuns;
+    int totalReclaimed;
+
 public:
     OSMemoryManager();
 
-    void allocateMemory(int size);     // User → OS request
-    void releaseReference(int id);     // Process termination
-    void garbageCollect();             // Memory reclamation
+    void allocateMemory(int size);
+    void releaseReference(int id);
+    void garbageCollect();
 
-    int getUsedMemory();
-    void displayMemoryStatus();
+    int getUsedMemory() const;
+    void displayMemoryStatus() const;
+    void displaySummary() const;
 };
 
-#endif
+#endif   
