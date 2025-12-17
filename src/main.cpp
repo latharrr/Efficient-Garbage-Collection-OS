@@ -10,22 +10,22 @@ int main() {
     while (true) {
         cout << "\n===== OS MEMORY MANAGEMENT MENU =====\n";
         cout << "1. Allocate Memory\n";
-        cout << "2. Delete Memory (Process Termination)\n";
+        cout << "2. Terminate Process\n";
         cout << "3. Run Garbage Collection\n";
         cout << "4. Display Memory Status\n";
         cout << "5. Exit\n";
-        cout << "Enter choice: ";
+        cout << "Choice: ";
         cin >> choice;
 
         if (choice == 1) {
             int size;
-            cout << "Enter memory size to allocate: ";
+            cout << "Memory Size (bytes): ";
             cin >> size;
             os.allocateMemory(size);
         }
         else if (choice == 2) {
             int id;
-            cout << "Enter Block ID to delete: ";
+            cout << "Enter Block ID: ";
             cin >> id;
             os.releaseReference(id);
         }
@@ -36,11 +36,8 @@ int main() {
             os.displayMemoryStatus();
         }
         else if (choice == 5) {
-            cout << "Exiting OS Memory Manager...\n";
+            os.displaySummary();
             break;
-        }
-        else {
-            cout << "Invalid choice!\n";
         }
     }
 
