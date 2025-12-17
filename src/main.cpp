@@ -37,4 +37,12 @@ int main() {
         }
         else if (choice == 5) {
             cout << "Exiting OS Memory Manager...\n";
-            br
+            break;
+        }
+        else {
+            cout << "Invalid choice!\n";
+        }
+    }
+
+    return 0;
+}
