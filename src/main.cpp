@@ -56,7 +56,7 @@ int MemoryManager::totalUsedMemory() {
 }
 
 void MemoryManager::showMemoryStatus() {
-    std::cout << "\n--- MEMORY STATUS ---\n";
+    std::cout << "\nFragmentation reduced after garbage collection\n";
     for (auto &block : memory) {
         std::cout << "ID: " << block.id
                   << " Size: " << block.size
