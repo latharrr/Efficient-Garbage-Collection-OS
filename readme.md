@@ -1,13 +1,23 @@
 # Efficient Garbage Collection in Operating Systems
 
-This project simulates basic memory management in an operating system using C++.
-It serves as the foundation for implementing efficient garbage collection
-techniques as part of OS memory management.
+This project simulates OS-level memory management using an efficient
+reference-count-based garbage collection mechanism.
 
-Course: CSE316 – Operating Systems
+## Features
+- Contiguous memory allocation
+- Process termination & memory release
+- Demand-based garbage collection
+- Fragment reuse to reduce memory wastage
+- Interactive menu-driven simulation
 
+## Compile & Run
+g++ src/main.cpp src/OSMemoryManager.cpp -o gc
+./gc   (Linux/Mac)
+gc.exe (Windows)
 
 ## Syllabus Mapping
-This project aligns with (Memory Management) of CSE316.
-It demonstrates memory allocation, fragmentation, and garbage collection
-for efficient memory utilization.
+- Unit I: OS responsibilities
+- Unit II: Process load simulation
+- Unit III: Critical section (conceptual)
+- Unit IV: Memory starvation prevention
+- Unit V: Memory allocation & reclamation
