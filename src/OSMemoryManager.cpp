@@ -4,15 +4,45 @@
 
 using namespace std;
 
-const int TOTAL_MEMORY = 1024;      // Simulated main memory
-const float GC_THRESHOLD = 0.70f;   // Demand-based GC trigger
+static const int TOTAL_MEMORY = 4096;     // 4 KB
+static const float GC_THRESHOLD = 0.75f; // Efficient GC trigger
 
 OSMemoryManager::OSMemoryManager() {
     nextId = 1;
+    totalGcRuns = 0;
+    totalReclaimed = 0;
 }
 
-// Allocate memory to a process
+// ---------------- ALLOCATION ----------------
 void OSMemoryManager::allocateMemory(int size) {
+
+    if (size <= 0 || size > TOTAL_MEMORY) {
+        cout << "[ERROR] Invalid memory request.\n";
+        return;
+    }
+
+    if (getUsedMemory() + size > TOTAL_MEMORY) {
+        cout << "[OS] Memory pressure detected. Running GC...\n";
+        garbageCollect();
+    }
+
+    if (getUsedMemory() + size > TOTAL_MEMORY) {
+        cout << "[ERROR] Allocation failed even after GC.\n";
+        return;
+    }
+
+    // Reuse free block if possible (fragmentation reduction)
+    for (auto &block : memory) {
+        if (!block.allocated && block.size >= size) {
+            block.id = nextId++;
+            block.size = size;
+            block.refCount = 1;
+            block.allocated = true;
+            cout << "[ALLOC] Reused block " << block.id << "\n";
+            return;
+        }
+    }
+
     MemoryBlock block;
     block.id = nextId++;
     block.size = size;
@@ -20,69 +50,71 @@ void OSMemoryManager::allocateMemory(int size) {
     block.allocated = true;
 
     memory.push_back(block);
+    cout << "[ALLOC] Block " << block.id << " allocated (" << size << " bytes)\n";
 
-    cout << "[ALLOC] Block ID " << block.id
-         << " allocated (" << size << " bytes)\n";
-
-    // Demand-based garbage collection
     if (getUsedMemory() > TOTAL_MEMORY * GC_THRESHOLD) {
-        cout << "\n[OS] High memory usage detected. Triggering GC...\n";
+        cout << "[OS] High memory usage (>75%). Scheduling GC...\n";
         garbageCollect();
     }
 }
 
-// Simulate process releasing memory
+// ---------------- RELEASE ----------------
 void OSMemoryManager::releaseReference(int id) {
     for (auto &block : memory) {
         if (block.id == id && block.allocated) {
-            block.refCount--;
-            cout << "[RELEASE] Reference removed from Block ID "
-                 << id << "\n";
+            block.refCount = 0;
+            cout << "[RELEASE] Process " << block.process << " terminated\n";
             return;
         }
     }
+    cout << "[WARN] Invalid Block ID\n";
 }
 
-// Reference-count based garbage collection
+// ---------------- GARBAGE COLLECTION ----------------
 void OSMemoryManager::garbageCollect() {
-    cout << "[GC] Garbage Collection Started\n";
+    totalGcRuns++;
+    int reclaimed = 0;
+
     for (auto &block : memory) {
         if (block.allocated && block.refCount == 0) {
+            reclaimed += block.size;
             block.allocated = false;
-            cout << "[GC] Block ID " << block.id
-                 << " reclaimed\n";
+            block.process = "---";
         }
     }
-    cout << "[GC] Garbage Collection Completed\n\n";
+
+    totalReclaimed += reclaimed;
+    cout << "[GC] Reclaimed " << reclaimed << " bytes\n";
 }
 
-// Calculate used memory
-int OSMemoryManager::getUsedMemory() {
+// ---------------- UTILITIES ----------------
+int OSMemoryManager::getUsedMemory() const {
     int used = 0;
-    for (auto &block : memory) {
-        if (block.allocated)
-            used += block.size;
-    }
+    for (const auto &block : memory)
+        if (block.allocated) used += block.size;
     return used;
 }
 
-// Display memory table
-void OSMemoryManager::displayMemoryStatus() {
+void OSMemoryManager::displayMemoryStatus() const {
     cout << "\n---------------- MEMORY STATUS ----------------\n";
-    cout << left << setw(10) << "BlockID"
+    cout << left << setw(6) << "ID"
+         << setw(15) << "Process"
          << setw(10) << "Size"
-         << setw(12) << "RefCount"
-         << setw(10) << "State" << "\n";
+         << setw(10) << "State\n";
 
-    for (auto &block : memory) {
-        cout << left << setw(10) << block.id
+    for (const auto &block : memory) {
+        cout << left << setw(6) << block.id
+             << setw(15) << block.process
              << setw(10) << block.size
-             << setw(12) << block.refCount
-             << setw(10)
-             << (block.allocated ? "USED" : "FREE") << "\n";
+             << setw(10) << (block.allocated ? "USED" : "FREE") << "\n";
     }
 
-    cout << "Total Used Memory: "
-         << getUsedMemory() << " / "
-         << TOTAL_MEMORY << " bytes\n";
+    cout << "Used Memory: " << getUsedMemory()
+         << " / " << TOTAL_MEMORY << " bytes\n";
+}
+
+void OSMemoryManager::displaySummary() const {
+    cout << "\n===== SYSTEM SUMMARY =====\n";
+    cout << "Total GC Runs       : " << totalGcRuns << "\n";
+    cout << "Total Memory Freed  : " << totalReclaimed << " bytes\n";
 }
