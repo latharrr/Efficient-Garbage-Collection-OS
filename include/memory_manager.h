@@ -6,7 +6,7 @@
 struct MemoryBlock {
     int id;
     int size;
-    int refCount; 
+    int refCount;
     bool allocated;
 };
 
@@ -16,10 +16,13 @@ private:
     int nextId;
 
 public:
-MemoryManager();
+    MemoryManager();
     void allocate(int size);
     void addReference(int id);
     void removeReference(int id);
+
+    // UNIT V: Garbage Collection
+    void garbageCollect();
 };
 
 #endif

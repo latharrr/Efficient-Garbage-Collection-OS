@@ -9,7 +9,7 @@ void MemoryManager::allocate(int size) {
     MemoryBlock block;
     block.id = nextId++;
     block.size = size;
-    block.refCount = 1;   // Initial reference
+    block.refCount = 1;
     block.allocated = true;
 
     memory.push_back(block);
@@ -40,6 +40,19 @@ void MemoryManager::removeReference(int id) {
     }
 }
 
+// 🔥 Garbage Collection Logic (Unit V)
+void MemoryManager::garbageCollect() {
+    std::cout << "\n[GC STARTED] Reclaiming unused memory...\n";
+
+    for (auto &block : memory) {
+        if (block.allocated && block.refCount == 0) {
+            block.allocated = false;
+            std::cout << "Garbage Collected Block ID: "
+                      << block.id << std::endl;
+        }
+    }
+}
+
 int main() {
     MemoryManager manager;
 
@@ -47,7 +60,9 @@ int main() {
     manager.allocate(200);
 
     manager.addReference(1);
-    manager.removeReference(2);
+    manager.removeReference(2);   // refCount becomes 0
+
+    manager.garbageCollect();     // GC invoked
 
     return 0;
 }
