@@ -21,8 +21,9 @@ public:
     void addReference(int id);
     void removeReference(int id);
 
-    // UNIT V: Garbage Collection
-    void garbageCollect();
+    void garbageCollect();          // Commit 3
+    void showMemoryStatus();         // Commit 4
+    int totalUsedMemory();           // Commit 4
 };
 
 #endif

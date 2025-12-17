@@ -14,7 +14,7 @@ void MemoryManager::allocate(int size) {
 
     memory.push_back(block);
 
-    std::cout << "Allocated memory block ID: "
+    std::cout << "Allocated Block ID: "
               << block.id << " Size: " << block.size << std::endl;
 }
 
@@ -22,8 +22,6 @@ void MemoryManager::addReference(int id) {
     for (auto &block : memory) {
         if (block.id == id && block.allocated) {
             block.refCount++;
-            std::cout << "Increased reference count of block "
-                      << id << std::endl;
             return;
         }
     }
@@ -33,23 +31,38 @@ void MemoryManager::removeReference(int id) {
     for (auto &block : memory) {
         if (block.id == id && block.allocated) {
             block.refCount--;
-            std::cout << "Decreased reference count of block "
-                      << id << std::endl;
             return;
         }
     }
 }
 
-// 🔥 Garbage Collection Logic (Unit V)
 void MemoryManager::garbageCollect() {
-    std::cout << "\n[GC STARTED] Reclaiming unused memory...\n";
-
+    std::cout << "\n[GC STARTED]\n";
     for (auto &block : memory) {
         if (block.allocated && block.refCount == 0) {
             block.allocated = false;
-            std::cout << "Garbage Collected Block ID: "
-                      << block.id << std::endl;
+            std::cout << "Reclaimed Block ID: " << block.id << std::endl;
         }
+    }
+}
+
+int MemoryManager::totalUsedMemory() {
+    int total = 0;
+    for (auto &block : memory) {
+        if (block.allocated)
+            total += block.size;
+    }
+    return total;
+}
+
+void MemoryManager::showMemoryStatus() {
+    std::cout << "\n--- MEMORY STATUS ---\n";
+    for (auto &block : memory) {
+        std::cout << "ID: " << block.id
+                  << " Size: " << block.size
+                  << " RefCount: " << block.refCount
+                  << " Allocated: " << block.allocated
+                  << std::endl;
     }
 }
 
@@ -58,11 +71,18 @@ int main() {
 
     manager.allocate(100);
     manager.allocate(200);
+    manager.allocate(300);
 
-    manager.addReference(1);
-    manager.removeReference(2);   // refCount becomes 0
+    manager.removeReference(2);   // make block eligible for GC
 
-    manager.garbageCollect();     // GC invoked
+    manager.showMemoryStatus();
+
+    // 🔥 Demand-based GC trigger
+    if (manager.totalUsedMemory() > 400) {
+        manager.garbageCollect();
+    }
+
+    manager.showMemoryStatus();
 
     return 0;
 }
