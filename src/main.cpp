@@ -66,6 +66,9 @@ void MemoryManager::showMemoryStatus() {
     }
 }
 
+// Garbage Collection frees memory blocks with zero references
+
+
 int main() {
     MemoryManager manager;
 
