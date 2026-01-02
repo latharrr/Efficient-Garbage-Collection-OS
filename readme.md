@@ -17,9 +17,8 @@ reference-count-based garbage collection mechanism.
 - Displays current memory usage table
 
 ## How to Compile and Run
-```bash
-g++ -I./include src/main.cpp src/OSMemoryManager.cpp -o program.exe
-.\program.exe    # Windows
+ g++ src/*.cpp -o main
+./main  # Windows
 ./program        # Linux/Mac
 ```
 
