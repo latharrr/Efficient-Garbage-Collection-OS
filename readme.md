@@ -1,5 +1,9 @@
 # Efficient Garbage Collection in Operating Systems
 
+Name- Deepanshu Lathar
+Reg No- 12420010
+Sub Code- CSE316
+
 This project simulates OS-level memory management using an efficient
 reference-count-based garbage collection mechanism.
 
