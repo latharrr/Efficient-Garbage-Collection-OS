@@ -15,7 +15,6 @@ int main() {
         cout << "4. Display Memory Status\n";
         cout << "5. Exit\n";
         cout << "Choice: ";
-        cout << "Choice: ";
 
         if (!(cin >> choice)) {
              cout << "[ERROR] Invalid input. Enter numbers only (1-5).\n";
